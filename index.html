@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>A Secret Message For You 💌</title>
+  
+  <!-- SEO & Social Sharing (Open Graph) -->
+  <meta name="description" content="A little secret message coded just for you.">
+  <meta property="og:title" content="A Secret Message For You 💌">
+  <meta property="og:description" content="I didn't write a love letter... I coded one.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#0d0614">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,900;1,500;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient Night Sky & Particle Canvas -->
+  <canvas id="ambientCanvas"></canvas>
+
+  <!-- Interactive Sound / Music Pill -->
+  <div id="audioWidget" class="audio-widget" title="Toggle romantic background music">
+    <div class="equalizer-bars">
+      <span class="bar bar-1"></span>
+      <span class="bar bar-2"></span>
+      <span class="bar bar-3"></span>
+      <span class="bar bar-4"></span>
+    </div>
+    <span class="audio-label" id="audioLabel">Music: Off</span>
+    <button class="audio-btn" id="audioToggleBtn" aria-label="Toggle music">
+      <svg class="audio-icon" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+      </svg>
+    </button>
+  </div>
+  <audio id="bgAudio" src="assets/audio/music.m4a" loop preload="auto"></audio>
+
+  <!-- Main Viewport Experience Wrapper -->
+  <main class="experience-container">
+
+    <!-- STEP 1: Secret Intro Card -->
+    <section id="secret" class="screen-card active">
+      <div class="glass-card secret-box">
+        <div class="envelope-badge">
+          <span class="envelope-emoji">💌</span>
+        </div>
+        <h1 class="secret-title">A little secret...</h1>
+        <p class="secret-desc">
+          I've been keeping something to myself. Maybe it's time you found out.
+        </p>
+        <button id="btnOpenHeart" class="glow-pill-btn" onclick="openLetter()">
+          <span>Open My Heart</span>
+          <span class="btn-heart-icon">💖</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 2: The Love Letter Card -->
+    <section id="letterSection" class="screen-card">
+      <div class="letter-paper">
+        <div class="paper-top-tag">
+          To someone who makes ordinary days feel different...
+        </div>
+        
+        <h2 class="letter-salutation">Dear You,</h2>
+
+        <div class="letter-body-wrapper">
+          <div id="letterText" class="letter-text"></div>
+          <span id="typingCursor" class="typing-cursor"></span>
+        </div>
+
+        <div id="letterSignature" class="letter-signature">
+          — From someone who secretly smiles because of you ♡
+        </div>
+
+        <div class="letter-actions">
+          <button id="btnOneMore" class="glow-pill-btn letter-btn" onclick="showFinale()">
+            <span>One More Thing...</span>
+            <span class="btn-arrow">✨</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 3: The Finale Screen -->
+    <section id="finaleSection" class="screen-card">
+      <div class="finale-wrapper">
+        <div class="beating-heart-badge">
+          <div class="heart-pulse-ring ring-1"></div>
+          <div class="heart-pulse-ring ring-2"></div>
+          <div class="heart-pulse-ring ring-3"></div>
+          <span class="heart-center-emoji">💖</span>
+        </div>
+
+        <h1 class="finale-heading">
+          Maybe you're<br>
+          <span class="highlight-pink">my favourite</span><br>
+          <span class="highlight-pink">person.</span>
+        </h1>
+
+        <p class="finale-subtext">
+          I don't know where this little story goes.<br>
+          But I know one thing... I'm really glad I met you.
+        </p>
+
+        <button id="btnKeepSecret" class="glow-pill-btn finale-btn" onclick="keepSecret()">
+          <span>Keep this secret</span>
+          <span class="btn-shh">🤫</span>
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Sweet In-App Dialog Modal (Okay... secret safely kept) -->
+  <div id="secretModal" class="secret-modal-overlay">
+    <div class="secret-modal-card">
+      <div class="modal-icon">🤫 💗</div>
+      <h3 class="modal-title">Secret Safely Kept</h3>
+      <p class="modal-msg">Okay... secret safely kept 🤫💗</p>
+      <p class="modal-submsg">It will stay between just you and me.</p>
+      <button class="glow-pill-btn modal-btn" onclick="closeSecretModal()">
+        <span>Promise! ♡</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Post-Finale Floating Controls (Replay & Love Toast) -->
+  <div id="floatingReplayBar" class="floating-replay-bar">
+    <button class="replay-btn" onclick="restartExperience()">
+      <span>Replay from Start 💌</span>
+    </button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,616 @@
+/* ==========================================================
+   A SECRET MESSAGE FOR YOU — STYLES
+   Inspired by Instagram Creative Coding Reels
+   ========================================================== */
+
+:root {
+  --bg-primary: #0b0512;
+  --bg-cosmic: radial-gradient(ellipse at 50% 25%, #1c0b2f 0%, #0d0517 55%, #050209 100%);
+  --text-white: #ffffff;
+  --text-dim: #cfc2dc;
+  --text-dark: #1b1322;
+  --text-dark-muted: #5e5468;
+  
+  --pink-primary: #ff4071;
+  --pink-secondary: #ff7597;
+  --pink-glow: rgba(255, 64, 113, 0.45);
+  --pink-gradient: linear-gradient(135deg, #ff4071 0%, #ff6b95 50%, #e0245e 100%);
+  --gold-glow: rgba(255, 215, 0, 0.3);
+
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-script: 'Dancing Script', cursive;
+
+  --transition-smooth: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Base Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  background-color: var(--bg-primary);
+  background-image: var(--bg-cosmic);
+  background-attachment: fixed;
+  color: var(--text-white);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Background Canvas */
+#ambientCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Audio Widget / Equalizer Pill */
+.audio-widget {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: rgba(28, 14, 42, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 182, 193, 0.22);
+  border-radius: 9999px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 64, 113, 0.15);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  user-select: none;
+}
+
+.audio-widget:hover {
+  background: rgba(38, 18, 58, 0.85);
+  border-color: rgba(255, 182, 193, 0.45);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 64, 113, 0.3);
+}
+
+.equalizer-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 16px;
+  width: 18px;
+}
+
+.bar {
+  width: 3px;
+  background: var(--pink-secondary);
+  border-radius: 2px;
+  height: 4px;
+  transition: height 0.2s ease;
+}
+
+.audio-widget.playing .bar-1 {
+  animation: eqJump 0.8s infinite ease-in-out alternate;
+}
+.audio-widget.playing .bar-2 {
+  animation: eqJump 0.6s infinite ease-in-out 0.2s alternate;
+}
+.audio-widget.playing .bar-3 {
+  animation: eqJump 0.9s infinite ease-in-out 0.4s alternate;
+}
+.audio-widget.playing .bar-4 {
+  animation: eqJump 0.7s infinite ease-in-out 0.1s alternate;
+}
+
+@keyframes eqJump {
+  0% { height: 4px; }
+  100% { height: 16px; background: #ff4071; }
+}
+
+.audio-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  letter-spacing: 0.02em;
+}
+
+.audio-btn {
+  background: transparent;
+  border: none;
+  color: var(--pink-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.audio-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Experience Container (Full Viewport Centered) */
+.experience-container {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 20px;
+}
+
+/* Screen Cards & Smooth State Switching */
+.screen-card {
+  position: absolute;
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.95) translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  visibility: hidden;
+}
+
+.screen-card.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1) translateY(0);
+  visibility: visible;
+  position: relative;
+}
+
+/* Common Glow Pill Button */
+.glow-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 34px;
+  border: none;
+  border-radius: 9999px;
+  background: var(--pink-gradient);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 8px 25px var(--pink-glow), 0 0 15px rgba(255, 107, 149, 0.25);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.glow-pill-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transition: 0.5s;
+}
+
+.glow-pill-btn:hover::before {
+  left: 100%;
+}
+
+.glow-pill-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 12px 32px rgba(255, 64, 113, 0.6), 0 0 25px rgba(255, 107, 149, 0.4);
+}
+
+.glow-pill-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* ==========================================================
+   STEP 1: SECRET INTRO CARD
+   ========================================================== */
+.glass-card {
+  background: rgba(22, 11, 35, 0.72);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 182, 193, 0.2);
+  border-radius: 28px;
+  padding: 44px 36px;
+  text-align: center;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 45px rgba(255, 64, 113, 0.12);
+  width: 100%;
+  max-width: 480px;
+}
+
+.envelope-badge {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 182, 193, 0.25);
+  border-radius: 20px;
+  font-size: 2rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 64, 113, 0.2);
+  animation: floatBounce 3s ease-in-out infinite;
+}
+
+@keyframes floatBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+.secret-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 5vw, 2.4rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 14px;
+  letter-spacing: -0.01em;
+}
+
+.secret-desc {
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: var(--text-dim);
+  margin-bottom: 32px;
+  font-weight: 400;
+}
+
+/* ==========================================================
+   STEP 2: LOVE LETTER CARD
+   ========================================================== */
+.letter-paper {
+  background: #ffffff;
+  color: var(--text-dark);
+  border-radius: 24px;
+  padding: 46px 42px;
+  width: 100%;
+  max-width: 530px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), 0 0 40px rgba(255, 105, 180, 0.15);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.letter-paper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--pink-gradient);
+}
+
+.paper-top-tag {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-dark-muted);
+  letter-spacing: 0.01em;
+  margin-bottom: 18px;
+}
+
+.letter-salutation {
+  font-family: var(--font-serif);
+  font-size: clamp(2.1rem, 5vw, 2.5rem);
+  font-weight: 700;
+  color: #120d18;
+  margin-bottom: 24px;
+  letter-spacing: -0.02em;
+}
+
+.letter-body-wrapper {
+  position: relative;
+  min-height: 250px;
+  font-size: clamp(0.98rem, 2.5vw, 1.05rem);
+  line-height: 1.75;
+  color: #2a2034;
+  font-weight: 450;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.letter-text {
+  display: inline;
+}
+
+.typing-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.15em;
+  background-color: var(--pink-primary);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: blink 0.8s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.letter-signature {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: #1a1223;
+  text-align: right;
+  margin-top: 26px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.letter-signature.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.letter-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 32px;
+}
+
+.letter-btn {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.letter-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* ==========================================================
+   STEP 3: FINALE SCREEN
+   ========================================================== */
+.finale-wrapper {
+  text-align: center;
+  padding: 20px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.beating-heart-badge {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heart-center-emoji {
+  font-size: 2.8rem;
+  position: relative;
+  z-index: 2;
+  animation: heartThump 1.2s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+  display: inline-block;
+  filter: drop-shadow(0 0 16px rgba(255, 64, 113, 0.6));
+}
+
+@keyframes heartThump {
+  0% { transform: scale(1); }
+  14% { transform: scale(1.22); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.18); }
+  70% { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+.heart-pulse-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 64, 113, 0.5);
+  animation: ringRipple 2.4s infinite ease-out;
+}
+
+.ring-2 {
+  animation-delay: 0.8s;
+}
+
+.ring-3 {
+  animation-delay: 1.6s;
+}
+
+@keyframes ringRipple {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.finale-heading {
+  font-family: var(--font-serif);
+  font-size: clamp(2.4rem, 7vw, 3.8rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 24px;
+  letter-spacing: -0.015em;
+}
+
+.highlight-pink {
+  background: linear-gradient(135deg, #ff4d88 0%, #ff8cb7 50%, #ff3377 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+  filter: drop-shadow(0 0 25px rgba(255, 77, 136, 0.45));
+}
+
+.finale-subtext {
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  line-height: 1.7;
+  color: var(--text-dim);
+  max-width: 480px;
+  margin-bottom: 38px;
+  font-weight: 400;
+}
+
+/* ==========================================================
+   SWEET MODAL DIALOG
+   ========================================================== */
+.secret-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(8, 3, 14, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.secret-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.secret-modal-card {
+  background: rgba(28, 14, 42, 0.95);
+  border: 1px solid rgba(255, 182, 193, 0.35);
+  border-radius: 28px;
+  padding: 40px 32px;
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.7), 0 0 40px rgba(255, 64, 113, 0.3);
+  transform: scale(0.92);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.secret-modal-overlay.active .secret-modal-card {
+  transform: scale(1);
+}
+
+.modal-icon {
+  font-size: 2.8rem;
+  margin-bottom: 16px;
+  animation: floatBounce 2.5s infinite ease-in-out;
+}
+
+.modal-title {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.modal-msg {
+  font-size: 1.12rem;
+  font-weight: 500;
+  color: #ff9bbb;
+  margin-bottom: 6px;
+}
+
+.modal-submsg {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  margin-bottom: 26px;
+}
+
+.modal-btn {
+  width: 100%;
+  padding: 13px 24px;
+}
+
+/* Floating Replay Bar */
+.floating-replay-bar {
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%) translateY(50px);
+  z-index: 90;
+  opacity: 0;
+  pointer-events: none;
+  transition: var(--transition-smooth);
+}
+
+.floating-replay-bar.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.replay-btn {
+  background: rgba(24, 12, 36, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 182, 193, 0.3);
+  color: #ffffff;
+  padding: 11px 24px;
+  border-radius: 9999px;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 64, 113, 0.2);
+  transition: all 0.3s ease;
+}
+
+.replay-btn:hover {
+  background: rgba(40, 18, 60, 0.95);
+  border-color: rgba(255, 182, 193, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(255, 64, 113, 0.35);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .experience-container {
+    padding: 20px 16px;
+  }
+  .glass-card {
+    padding: 34px 22px;
+  }
+  .letter-paper {
+    padding: 34px 22px;
+  }
+  .letter-body-wrapper {
+    min-height: 220px;
+    font-size: 0.96rem;
+    line-height: 1.68;
+  }
+  .audio-widget {
+    top: 14px;
+    right: 14px;
+    padding: 6px 12px;
+  }
+  .audio-label {
+    display: none;
+  }
+}
